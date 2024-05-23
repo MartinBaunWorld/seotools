@@ -35,9 +35,9 @@ def write(path, msg):
 
 def cutoff(sitename, urls):
     """
-        This ensures only 499 per chunks are sent each request
+        This ensures only 99 per chunks are sent each request
     """
-    MAX_CHUNKS = 499
+    MAX_CHUNKS = 99
     # TODO: this seems to work, but is ugly.
     if len(urls) < MAX_CHUNKS:
         return urls
