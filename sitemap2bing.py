@@ -1,5 +1,16 @@
 #!/usr/bin/python3
 
+"""
+sitemap2bing.py is a little tool that helps you submit your sitemap to bing.
+Bing really likes to receive these submissions and it'll help with ranking higher.
+
+Example usage:
+
+```
+python3 sitemap2bing.py YOUR_BING_KEY https://martinbaun.com/sitemap.xml
+```
+"""
+
 from urllib.parse import urlparse
 from requests import get, post
 from datetime import datetime
@@ -7,6 +18,41 @@ from traceback import format_exc
 
 from bs4 import BeautifulSoup
 from docopt import docopt
+
+
+def read_or_default(path, default):
+    try:
+        with open(path, 'r') as f:
+            return f.read()
+    except:
+        return default
+
+
+def write(path, msg):
+    with open(path, 'w') as f:
+        return f.write(msg)
+
+
+def cutoff(sitename, urls):
+    """
+        This ensures only 499 per chunks are sent each request
+    """
+    MAX_CHUNKS = 499
+    # TODO: this seems to work, but is ugly.
+    if len(urls) < MAX_CHUNKS:
+        return urls
+
+    start = int(read_or_default(f'/tmp/{sitename}.txt', 0))
+    end = start + MAX_CHUNKS 
+    if end > len(urls):
+        new_start = 0
+    else:
+        new_start = end
+
+    write(f'/tmp/{sitename}.txt', str(new_start))
+        
+
+    return urls[start:end]
 
 
 def send_sitemap_links(content, bingauth):
@@ -42,9 +88,10 @@ def main(sitemap, bingauth, max_deep_level):
             return
         
         site_url = urlparse(urls[0])
+        urls = cutoff(site_url.hostname, urls)
         bing_data = dict(
             siteUrl=f"{site_url.scheme}://{site_url.hostname}",
-            urlList=[url for url in urls if '/tags/' not in url],
+            urlList=urls,
         )
         send_sitemap_links(bing_data, bingauth)
     except: # noqa
