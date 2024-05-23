@@ -1,6 +1,6 @@
 # SEO utils
 
-A collection of small SEO utils I use to help me and might help you
+A collection of small SEO utils I use to help me and might help you.
 Currently, only one but let's see where this goes :)
 
 
